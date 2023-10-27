@@ -1,72 +1,82 @@
 import plotly.graph_objects as go
 
-import pandas as pd
+from hrit.utils import init_logger
+from hrit.models import Database
+
+APP_NAME = "hrit"
+lg = init_logger(APP_NAME)
 
 
-def app():
-    # load dataset
-    df = pd.read_csv(
-        "https://raw.githubusercontent.com/plotly/datasets/master/volcano.csv"
-    )
+class Dashboard:
+    def __init__(self, table_name: str = "1_tball"):
+        self.fig = go.Figure()
+        self.db = Database()
+        lg.info("database initialized")
+        self.df = self.db[table_name]
+        lg.info(f"loaded table '{table_name}' from db")
 
-    # create figure
-    fig = go.Figure()
+    def create_plotly_figure(self) -> go.Figure:
+        fig = go.Figure()
+        df = self.df
 
-    # Add surface trace
-    fig.add_trace(go.Surface(z=df.values.tolist(), colorscale="Viridis"))
-
-    # Update plot sizing
-    fig.update_layout(
-        width=800,
-        height=900,
-        autosize=False,
-        margin=dict(t=0, b=0, l=0, r=0),
-        template="plotly_white",
-    )
-
-    # Update 3D scene options
-    fig.update_scenes(aspectratio=dict(x=1, y=1, z=0.7), aspectmode="manual")
-
-    # Add dropdown
-    fig.update_layout(
-        updatemenus=[
-            dict(
-                type="buttons",
-                direction="left",
-                buttons=list(
-                    [
-                        dict(
-                            args=["type", "surface"],
-                            label="3D Surface",
-                            method="restyle",
-                        ),
-                        dict(
-                            args=["type", "heatmap"], label="Heatmap", method="restyle"
-                        ),
-                    ]
+        fig.add_trace(
+            go.Table(
+                header=dict(
+                    values=list(df.columns), fill_color="paleturquoise", align="left"
                 ),
-                pad={"r": 10, "t": 10},
-                showactive=True,
-                x=0.11,
-                xanchor="left",
-                y=1.1,
-                yanchor="top",
-            ),
-        ]
-    )
-
-    # Add annotation
-    fig.update_layout(
-        annotations=[
-            dict(
-                text="Trace type:",
-                showarrow=False,
-                x=0,
-                y=1.08,
-                yref="paper",
-                align="left",
+                cells=dict(
+                    values=df.transpose().values.tolist(),
+                    fill_color="lavender",
+                    align="left",
+                ),
             )
-        ]
-    )
+        )
+        buttons = []
+        for i, product in enumerate(df["PRODUCT_NAME"].unique()):
+            df_ = df[df["PRODUCT_NAME"] == product]
+            buttons.append(
+                dict(
+                    method="update",
+                    label=f"{product}",
+                    args=[
+                        {
+                            "header": dict(
+                                values=list(df_.columns),
+                                fill_color="paleturquoise",
+                                align="left",
+                            ),
+                            "cells": dict(
+                                values=df_.transpose().values.tolist(),
+                                fill_color="lavender",
+                                align="left",
+                            ),
+                        }
+                    ],
+                )
+            )
 
-    fig.show()
+        # Add buttons
+        fig.update_layout(
+            updatemenus=[
+                dict(
+                    type="buttons",
+                    direction="left",
+                    buttons=buttons,
+                    pad={"r": 10, "t": 10},
+                    showactive=True,
+                    x=0.11,
+                    xanchor="left",
+                    y=1.1,
+                    yanchor="top",
+                ),
+            ]
+        )
+        return fig
+
+    def export_html(self, filename: str = "dashboard.html"):
+        self.fig.write_html(filename)
+
+
+def create_dashboard_report():
+    d = Dashboard(table_name="1_tball")
+    d.export_html("dashboard.html")
