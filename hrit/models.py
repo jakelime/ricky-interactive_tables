@@ -1,7 +1,7 @@
 from collections import UserDict
 import pandas as pd
-
 from hrit.utils import init_logger, PathFinder
+
 
 APP_NAME = "hrit"
 lg = init_logger(APP_NAME)
@@ -23,7 +23,8 @@ class Database(UserDict):
 
 def main():
     db = Database()
-    print(db["1_tball"])
+    df = db["1_tball"]
+    print(df)
 
 
 if __name__ == "__main__":

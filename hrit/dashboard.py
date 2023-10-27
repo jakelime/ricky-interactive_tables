@@ -71,6 +71,7 @@ class Dashboard:
                 ),
             ]
         )
+        self.fig = fig
         return fig
 
     def export_html(self, filename: str = "dashboard.html"):
@@ -80,4 +81,5 @@ class Dashboard:
 
 def create_dashboard_report():
     d = Dashboard(table_name="1_tball")
+    d.create_plotly_figure()
     d.export_html("dashboard.html")
