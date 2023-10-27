@@ -75,6 +75,7 @@ class Dashboard:
 
     def export_html(self, filename: str = "dashboard.html"):
         self.fig.write_html(filename)
+        lg.info(f"exported html - {filename}")
 
 
 def create_dashboard_report():
