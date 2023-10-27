@@ -3,10 +3,14 @@
 Help ricky to generate interactive tables
 App to generate exported single html file for reporting purposes
 
+Sample:
+
+![screenshot of dashboard](images/hrit-demo.gif "screenshot of dashboard")
+
 ## Quickstart
 
-1. `pip install -r requirements.txt`
 1. `git clone git@github.com:jakelime/ricky-interactive_tables.git`
+1. `pip install -r requirements.txt`
 1. `cd ricky-interactive_tables`
 1. Load your datafiles (confidential) into `/ricky-interactive_tables/input_files`
 
