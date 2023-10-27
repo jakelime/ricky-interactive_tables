@@ -1,6 +1,6 @@
-# Interactive tables for Ricky
+# Interactive tables for Randall
 
-Help ricky to generate interactive tables
+Help Randall to generate interactive tables
 App to generate exported single html file for reporting purposes
 
 Sample:
