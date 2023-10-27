@@ -75,36 +75,19 @@ def init_logger(
 
 
 class PathFinder:
-    def __init__(self, resources_foldername: str = "resources"):
+    def __init__(self, resources_foldername: str = ""):
         self.cwd = Path(__file__).parent.parent
         if resources_foldername:
-            self.set_resources_dir(resources_foldername)
-        else:
-            self.resources_dir = NonePath()
+            self.cwd = self.cwd / resources_foldername
+            if not self.cwd.is_dir():
+                raise NotADirectoryError(f"{resources_foldername=}")
 
-    def __call__(self, name) -> Path:
-        return self.get_resource(name)
-
-    def get_pdf_files(self) -> list[Path]:
-        files = [x for x in self.cwd.glob("*.[pP][dD][fF]")]
+    def get_csv_files(self) -> list[Path]:
+        files = [x for x in self.cwd.glob("*.[cC][sS][vV]")]
         return sorted(files)
 
-    def set_resources_dir(self, name: str = "resources") -> Path:
-        resources_dir = self.cwd / name
-        if not resources_dir.is_dir():
-            raise NotADirectoryError(f"target resources_dir={resources_dir}")
-        self.resources_dir = resources_dir
-        return resources_dir
-
-    def get_resources_dir(self, name: str = "") -> Path:
-        if name:
-            self.set_resources_dir(name)
-        else:
-            self.set_resources_dir()
-        return self.resources_dir  # type: ignore (handled by set_resources_dir)
-
-    def get_resource(self, name: str) -> Path:
-        fp = self.get_resources_dir() / name  # type: ignore
+    def get_single_file(self, name: str) -> Path:
+        fp = self.cwd / name
         if not fp.is_file():
-            raise FileNotFoundError(f"{fp=}")
+            raise FileNotFoundError(f"{name=} in '{self.cwd}'")
         return fp
